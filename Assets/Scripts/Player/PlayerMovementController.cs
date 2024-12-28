@@ -1,11 +1,10 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Player
 {
     public class PlayerMovementController : MonoBehaviour
     {
-        [SerializeField] private PlayerInputController playerInputController;
+        [SerializeField] private PlayerInputController _playerInputController;
         [SerializeField] private PlayerGroundChecker _playerGroundChecker;
         [SerializeField] private float _moveSpeed = 5f; // Скорость движения игрока
         [SerializeField] private float _flightSpeed = 3f;
@@ -14,33 +13,24 @@ namespace Player
         private Rigidbody2D _rigidbody;
         private Vector2 _movement;
         private bool _facingRight = true; // Флаг, показывающий в какую сторону повернут персонаж
-        private bool _isGrounded;
         private float _currentSpeed;
 
         private void Start()
         {
             _rigidbody = GetComponent<Rigidbody2D>();
             
-            // Зафиксировать вращение
-            _rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
-            
-            playerInputController.MoveRight += MoveRight;
-            playerInputController.MoveLeft += MoveLeft;
-            playerInputController.StopMove += StopMove;
-            playerInputController.Jump += Jump;
-
-            _playerGroundChecker.CheckGround += CheckGround;
-        }
-        
-        private void Update()
-        {
+            _playerInputController.MoveRight += MoveRight;
+            _playerInputController.MoveLeft += MoveLeft;
+            _playerInputController.StopMove += StopMove;
+            _playerInputController.Jump += Jump;
+            _playerInputController.Attack += Attack;
         }
 
         private void MoveRight()
         {
             TurnRight();
             
-            if (_isGrounded)
+            if (_playerGroundChecker.IsGrounded)
             {
                 // Обновляем направление движения вправо
                 _movement.x = _moveSpeed;
@@ -61,14 +51,14 @@ namespace Player
             }
             
             // Задаем движение по оси X, при этом оставляем ось Y без изменений
-            _rigidbody.velocity = new Vector2(_movement.x, _rigidbody.velocity.y);
+            _rigidbody.linearVelocity = new Vector2(_movement.x, _rigidbody.linearVelocity.y);
         }
         
         private void MoveLeft()
         {
             TurnLeft();
             
-            if (_isGrounded)
+            if (_playerGroundChecker.IsGrounded)
             {
                 // Обновляем направление движения влево
                 _movement.x = -_moveSpeed;
@@ -89,16 +79,15 @@ namespace Player
             }
             
             // Задаем движение по оси X, при этом оставляем ось Y без изменений
-            _rigidbody.velocity = new Vector2(_movement.x, _rigidbody.velocity.y);
+            _rigidbody.linearVelocity = new Vector2(_movement.x, _rigidbody.linearVelocity.y);
         }
 
         private void StopMove()
         {
-            // Обновляем направление движения вправо
             _movement.x = 0;
 
             // Задаем движение по оси X, при этом оставляем ось Y без изменений
-            _rigidbody.velocity = new Vector2(_movement.x, _rigidbody.velocity.y);
+            _rigidbody.linearVelocity = new Vector2(_movement.x, _rigidbody.linearVelocity.y);
         }
         
         private void TurnRight()
@@ -127,16 +116,14 @@ namespace Player
         
         private void Jump()
         {
-            if (_isGrounded)
+            if (_playerGroundChecker.IsGrounded)
             {
-                _rigidbody.velocity = new Vector2(_rigidbody.velocity.x, _jumpForce);
+                _rigidbody.linearVelocity = new Vector2(_rigidbody.linearVelocity.x, _jumpForce);
             }
         }
 
-        private void CheckGround(bool isGrounded)
+        private void Attack()
         {
-            _isGrounded = isGrounded;
         }
-        
     }
 }

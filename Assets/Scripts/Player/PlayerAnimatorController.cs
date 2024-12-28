@@ -1,33 +1,81 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Player
 {
     public class PlayerAnimatorController : MonoBehaviour
     {
-        [SerializeField] private PlayerInputController playerInputController;
+        [SerializeField] private PlayerInputController _playerInputController;
         [SerializeField] private PlayerGroundChecker _playerGroundChecker;
 
         private Animator _animator;
         
+        private float _previousYPosition; // Предыдущее значение Y координаты
+        private float _currentYPosition;  // Текущее значение Y координаты
+        
         private static readonly int IsRunning = Animator.StringToHash("isRunning");
-        private static readonly int IsFlying = Animator.StringToHash("isFlying");
+        private static readonly int IsFlyingUp = Animator.StringToHash("isFlyingUp");
+        private static readonly int IsFlyingDown = Animator.StringToHash("isFlyingDown");
+        private static readonly int Attack1 = Animator.StringToHash("attack");
 
         private void Awake()
         {
             _animator = GetComponent<Animator>();
+            
+            // Инициализируем предыдущую позицию текущей позицией персонажа
+            _previousYPosition = transform.position.y;
         }
 
         private void Start()
         {
-            playerInputController.MoveRight += Walk;
-            playerInputController.MoveLeft += Walk;
-            playerInputController.StopMove += Stop;
-            
-            _playerGroundChecker.CheckGround += Jump;
+            _playerInputController.MoveRight += Run;
+            _playerInputController.MoveLeft += Run;
+            _playerInputController.StopMove += Stop;
+            _playerInputController.Attack += Attack;
         }
 
-        private void Walk()
+        private void Attack()
+        {
+            _animator.SetTrigger(Attack1);
+        }
+
+        private void FixedUpdate()
+        {
+            HandleJumpAnimation();
+        }
+        
+        private void HandleJumpAnimation()
+        {
+            var currentYPosition = transform.position.y;
+
+            if (_playerGroundChecker.IsGrounded)
+            {
+                SetFlying(false, false);
+            }
+            else
+            {
+                var isFlyingUp = currentYPosition > _previousYPosition;
+                var isFlyingDown = currentYPosition < _previousYPosition;
+
+                SetFlying(isFlyingUp, isFlyingDown);
+            }
+
+            _previousYPosition = currentYPosition;
+        }
+        
+        private void SetFlying(bool isFlyingUp, bool isFlyingDown)
+        {
+            if (_animator.GetBool(IsFlyingUp) != isFlyingUp)
+            {
+                _animator.SetBool(IsFlyingUp, isFlyingUp);
+            }
+
+            if (_animator.GetBool(IsFlyingDown) != isFlyingDown)
+            {
+                _animator.SetBool(IsFlyingDown, isFlyingDown);
+            }
+        }
+
+        private void Run()
         {
             _animator.SetBool(IsRunning, true);
         }
@@ -37,18 +85,5 @@ namespace Player
             _animator.SetBool(IsRunning, false);
         }
 
-        private void Jump(bool isGrounded)
-        {
-            if (isGrounded)
-            {
-                _animator.SetBool(IsFlying, false);
-            }
-
-            if (!isGrounded)
-            {
-                _animator.SetBool(IsFlying, true);
-            }
-            
-        }
     }
 }

@@ -9,15 +9,13 @@ namespace Player
         public event Action MoveLeft;
         public event Action StopMove;
         public event Action Jump;
-        
-        private void Awake()
-        {
-        }
+        public event Action Attack;
 
         private void Update()
         {
             Move();
             Jump1();
+            Attack1();
         }
 
         private void Move()
@@ -49,6 +47,15 @@ namespace Player
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 Jump?.Invoke();
+            }
+        }
+
+        private void Attack1()
+        {
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                Attack?.Invoke();
+                StopMove?.Invoke();
             }
         }
     }
