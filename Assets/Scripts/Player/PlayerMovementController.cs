@@ -1,31 +1,37 @@
+using System;
 using UnityEngine;
 
 namespace Player
 {
     public class PlayerMovementController : MonoBehaviour
     {
-        [SerializeField] private PlayerInputController _playerInputController;
+        public bool IsFacingRight { get; private set; } // Флаг, показывающий в какую сторону повернут персонаж
+
         [SerializeField] private PlayerGroundChecker _playerGroundChecker;
         [SerializeField] private float _moveSpeed = 5f; // Скорость движения игрока
         [SerializeField] private float _flightSpeed = 3f;
         [SerializeField] private float _jumpForce = 6f; // Сила прыжка
         
-        private Rigidbody2D _rigidbody;
+        private PlayerInputController _playerInputController;
+        private Rigidbody2D _rb;
         private Vector2 _movement;
-        public bool IsFacingRight { get; private set; } // Флаг, показывающий в какую сторону повернут персонаж
         private float _currentSpeed;
+
+        private void Awake()
+        {
+            _playerInputController = GetComponent<PlayerInputController>();
+            _rb = GetComponent<Rigidbody2D>();
+            
+            IsFacingRight = true;
+        }
 
         private void Start()
         {
-            _rigidbody = GetComponent<Rigidbody2D>();
-            
             _playerInputController.MoveRight += MoveRight;
             _playerInputController.MoveLeft += MoveLeft;
             _playerInputController.StopMove += StopMove;
             _playerInputController.Jump += Jump;
             _playerInputController.Attack += Attack;
-
-            IsFacingRight = true;
         }
 
         private void MoveRight()
@@ -53,7 +59,7 @@ namespace Player
             }
             
             // Задаем движение по оси X, при этом оставляем ось Y без изменений
-            _rigidbody.linearVelocity = new Vector2(_movement.x, _rigidbody.linearVelocity.y);
+            _rb.linearVelocity = new Vector2(_movement.x, _rb.linearVelocity.y);
         }
         
         private void MoveLeft()
@@ -81,7 +87,7 @@ namespace Player
             }
             
             // Задаем движение по оси X, при этом оставляем ось Y без изменений
-            _rigidbody.linearVelocity = new Vector2(_movement.x, _rigidbody.linearVelocity.y);
+            _rb.linearVelocity = new Vector2(_movement.x, _rb.linearVelocity.y);
         }
 
         private void StopMove()
@@ -89,7 +95,7 @@ namespace Player
             _movement.x = 0;
 
             // Задаем движение по оси X, при этом оставляем ось Y без изменений
-            _rigidbody.linearVelocity = new Vector2(_movement.x, _rigidbody.linearVelocity.y);
+            _rb.linearVelocity = new Vector2(_movement.x, _rb.linearVelocity.y);
         }
         
         private void TurnRight()
@@ -120,7 +126,7 @@ namespace Player
         {
             if (_playerGroundChecker.IsGrounded)
             {
-                _rigidbody.linearVelocity = new Vector2(_rigidbody.linearVelocity.x, _jumpForce);
+                _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, _jumpForce);
             }
         }
 

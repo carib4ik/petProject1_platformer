@@ -4,11 +4,10 @@ namespace Player
 {
     public class PlayerAnimatorController : MonoBehaviour
     {
-        [SerializeField] private PlayerInputController _playerInputController;
         [SerializeField] private PlayerGroundChecker _playerGroundChecker;
-
-        private Animator _animator;
         
+        private PlayerInputController _playerInputController;
+        private Animator _animator;
         private float _previousYPosition; // Предыдущее значение Y координаты
         private float _currentYPosition;  // Текущее значение Y координаты
         
@@ -19,6 +18,7 @@ namespace Player
 
         private void Awake()
         {
+            _playerInputController = GetComponent<PlayerInputController>();
             _animator = GetComponent<Animator>();
             
             // Инициализируем предыдущую позицию текущей позицией персонажа

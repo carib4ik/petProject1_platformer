@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,11 +7,17 @@ namespace Player
     public class Wand : MonoBehaviour
     {
         [SerializeField] private GameObject _fireBall;
-        [SerializeField] private PlayerMovementController _playerMovementController;
         [SerializeField] private Transform _wandPosition;
 
+        private PlayerMovementController _playerMovementController;
+
         private readonly Queue<GameObject> _fireBalls = new();
-        
+
+        private void Awake()
+        {
+            _playerMovementController = GetComponent<PlayerMovementController>();
+        }
+
         private void ThrowFireBall()
         {
             // Определяем направление фаербола в зависимости от направления персонажа

@@ -55,8 +55,12 @@ namespace Player
         {
             // возвращаем направление по умолчанию, чтобы не было переповоротов спрайта при повторном использовании
             var scaler = transform.localScale;
-            scaler.x = 1;
-            transform.localScale = scaler;
+            if (scaler.x < 0)
+            {
+                scaler.x *= -1;
+                transform.localScale = scaler;
+            }
+            
             
             _wand.DisableFireBall(transform.gameObject);
         }
