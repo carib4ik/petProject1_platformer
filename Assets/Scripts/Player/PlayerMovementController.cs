@@ -12,7 +12,7 @@ namespace Player
         
         private Rigidbody2D _rigidbody;
         private Vector2 _movement;
-        private bool _facingRight = true; // Флаг, показывающий в какую сторону повернут персонаж
+        public bool IsFacingRight { get; private set; } // Флаг, показывающий в какую сторону повернут персонаж
         private float _currentSpeed;
 
         private void Start()
@@ -24,6 +24,8 @@ namespace Player
             _playerInputController.StopMove += StopMove;
             _playerInputController.Jump += Jump;
             _playerInputController.Attack += Attack;
+
+            IsFacingRight = true;
         }
 
         private void MoveRight()
@@ -92,26 +94,26 @@ namespace Player
         
         private void TurnRight()
         {
-            if (_facingRight) return;
+            if (IsFacingRight) return;
             
             // Переворачиваем объект по оси X, что автоматически перевернет спрайт и коллайдер
             var scaler = transform.localScale;
             scaler.x *= -1;
             transform.localScale = scaler;
             
-            _facingRight = true;
+            IsFacingRight = true;
         }
         
         private void TurnLeft()
         {
-            if (!_facingRight) return;
+            if (!IsFacingRight) return;
             
             // Переворачиваем объект по оси X, что автоматически перевернет спрайт и коллайдер
             var scaler = transform.localScale;
             scaler.x *= -1;
             transform.localScale = scaler;
             
-            _facingRight = false;
+            IsFacingRight = false;
         }
         
         private void Jump()
